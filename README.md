@@ -1,0 +1,4 @@
+mcquine
+=======
+
+Quine McCluskey Simulator
