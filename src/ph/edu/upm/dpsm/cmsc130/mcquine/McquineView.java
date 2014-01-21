@@ -1,10 +1,10 @@
-package ph.edu.upm.dpsm.cmsc130.view;
+package ph.edu.upm.dpsm.cmsc130.mcquine;
 
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 
-public class QMApplication {
+public class McquineView {
 
 	private JFrame frame;
 
@@ -15,7 +15,7 @@ public class QMApplication {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					QMApplication window = new QMApplication();
+					McquineView window = new McquineView();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -27,7 +27,7 @@ public class QMApplication {
 	/**
 	 * Create the application.
 	 */
-	public QMApplication() {
+	public McquineView() {
 		initialize();
 	}
 
@@ -39,5 +39,4 @@ public class QMApplication {
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
-
 }
