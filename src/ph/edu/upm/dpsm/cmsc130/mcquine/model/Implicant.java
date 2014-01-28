@@ -29,7 +29,11 @@ public class Implicant{
 		return binaryValue;
 	}
 	
-	public String getMinterms(){
-		return Arrays.toString(minterms);
+	public String getMintermList(){
+		String list = new String(" ");
+		for(int i = 0; i < minterms.length; i++){
+			list += minterms[i] + " ";
+		}
+		return list.trim();
 	}
 }
