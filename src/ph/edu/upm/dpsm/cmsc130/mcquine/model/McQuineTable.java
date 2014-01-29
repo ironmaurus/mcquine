@@ -9,7 +9,7 @@ public class McQuineTable {
 	public McQuineTable(int size){
 		this.size = size;
 		mcQuineSections = new HashMap<Integer, ArrayList<Implicant>>();
-		for(int bitCount = 0; bitCount <= size; bitCount++){
+		for(int bitCount = 0; bitCount < size; bitCount++){
 			mcQuineSections.put(bitCount, new ArrayList<Implicant>());
 		}
 	}
@@ -29,7 +29,7 @@ public class McQuineTable {
 	
 	public void printTable(){
 		ArrayList<Implicant> bufferGroup;
-		for(int i = 0; i <= size; i++){
+		for(int i = 0; i < size; i++){
 			System.out.println("-----------------MCQUINESECTION: "+i+" --------------------------");
 			bufferGroup = mcQuineSections.get(i);
 			
@@ -37,12 +37,23 @@ public class McQuineTable {
 				System.out.println("EMPTY!");
 			}
 			else{
-				System.out.println("Minterms\tBinaryValue\tDashes\tisPaired");
+				System.out.println("BitCount\tMinterms\tBinaryValue\tDashes\tisPaired");
 				for(Implicant imp :  bufferGroup){
 					System.out.println(imp.toString());
 				}
 			}
 		}
+	}
+	
+	public ArrayList<Implicant> getImplicantList(){
+		ArrayList<Implicant> implicantList = new ArrayList<Implicant>();
+		for(Map.Entry<Integer, ArrayList<Implicant>> entry : mcQuineSections.entrySet()){
+			for(Implicant imp : entry.getValue()){
+				implicantList.add(imp);
+			}
+		}
+
+		return implicantList;
 	}
 
 	public boolean isComparable() {

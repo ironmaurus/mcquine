@@ -29,6 +29,10 @@ public class Implicant{
 	public int getBitCount(){
 		return bitCount;
 	}
+	
+	public String getDashPositions(){
+		return Arrays.toString(dashPositions);
+	}
 
 	public boolean isPaired() {
 		return isPaired;
@@ -39,7 +43,7 @@ public class Implicant{
 	}
 	
 	public String toString(){
-		return Arrays.toString(minterms) + "\t\t" + binaryValue + "\t\t" + Arrays.toString(dashPositions) + "\t" + isPaired;
+		return bitCount + "\t\t" + Arrays.toString(minterms) + "\t\t" + binaryValue + "\t\t" + Arrays.toString(dashPositions) + "\t" + isPaired;
 	}
 	
 	public String getBinaryValue(){
