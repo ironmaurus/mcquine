@@ -2,7 +2,6 @@ package ph.edu.upm.dpsm.cmsc130.mcquine;
 
 import java.math.*;
 import java.util.*;
-
 import ph.edu.upm.dpsm.cmsc130.mcquine.model.*;
 
 public class McQuineController {
@@ -87,10 +86,6 @@ public class McQuineController {
 		int size = LITERAL_COUNT;
 		McQuineTable bufferTable;
 		
-		while(size < LITERAL_COUNT){
-			
-		}
-		
 		bufferTable = new McQuineTable(size);
 		/*
 		 * Group implicants based on number of 1s 
@@ -107,10 +102,19 @@ public class McQuineController {
 		/*
 		 * Compare sections to produce the next tables. Loop until all minterms compared 
 		 */
-		bufferTable = new McQuineTable(size);
-		
-		
-		
+		HashMap<Integer, ArrayList<Implicant>> sections;
+		do{
+			
+			
+			//bufferTable = new McQuineTable(sections.size()-1);
+			
+			sections = bufferTable.getMcQuineSections();
+			
+			
+			for(int i = 0; i < bufferTable.getSize(); i++){
+				
+			}
+		}while(bufferTable.isComparable());
 	}
 
 	private void print(int[] minterms){

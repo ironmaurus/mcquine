@@ -1,30 +1,37 @@
 package ph.edu.upm.dpsm.cmsc130.mcquine.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 public class McQuineTable {
 	private final int size;
-	private HashMap<Integer, ArrayList<Implicant>> implicantGroups; 
+	private HashMap<Integer, ArrayList<Implicant>> mcQuineSections; 
 	
 	public McQuineTable(int size){
 		this.size = size;
-		implicantGroups = new HashMap<Integer, ArrayList<Implicant>>();
+		mcQuineSections = new HashMap<Integer, ArrayList<Implicant>>();
 		for(int bitCount = 0; bitCount <= size; bitCount++){
-			 implicantGroups.put(bitCount, new ArrayList<Implicant>());
+			mcQuineSections.put(bitCount, new ArrayList<Implicant>());
 		}
+	}
+	
+	public int getSize(){
+		return size;
 	}
 
 	public void addImplicant(int bitCount, Implicant imp) {
-		ArrayList<Implicant> bufferGroup = implicantGroups.get(bitCount);
+		ArrayList<Implicant> bufferGroup = mcQuineSections.get(bitCount);
 		bufferGroup.add(imp);
+	}
+	
+	public HashMap<Integer, ArrayList<Implicant>> getMcQuineSections(){
+		return mcQuineSections;
 	}
 	
 	public void printTable(){
 		ArrayList<Implicant> bufferGroup;
 		for(int i = 0; i <= size; i++){
-			System.out.println("-----------------BITCOUNT: "+i+" --------------------------");
-			bufferGroup = implicantGroups.get(i);
+			System.out.println("-----------------MCQUINESECTION: "+i+" --------------------------");
+			bufferGroup = mcQuineSections.get(i);
 			
 			if(bufferGroup.isEmpty()){
 				System.out.println("EMPTY!");
@@ -36,5 +43,9 @@ public class McQuineTable {
 				}
 			}
 		}
+	}
+
+	public boolean isComparable() {
+			return (mcQuineSections.size() > 1) ? true : false;
 	}
 }

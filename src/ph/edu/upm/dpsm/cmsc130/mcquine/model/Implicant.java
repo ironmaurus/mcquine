@@ -1,6 +1,6 @@
 package ph.edu.upm.dpsm.cmsc130.mcquine.model;
 
-import java.util.Arrays;
+import java.util.*;
 
 public class Implicant{
 	private int[] minterms, dashPositions;
