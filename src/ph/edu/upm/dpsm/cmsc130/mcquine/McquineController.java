@@ -53,7 +53,7 @@ public class McQuineController {
 			minterm = new int[]{minterms[i]};
 			raw = Integer.toBinaryString(minterms[i]);
 			formatted = String.format("%0"+LITERAL_COUNT+"d", new BigInteger(raw));
-			implicants[i] = new Implicant(minterm, formatted);
+			implicants[i] = new Implicant(minterm, formatted, null);
 		}
 
 		print(implicants);
@@ -78,28 +78,39 @@ public class McQuineController {
 	}
 
 	/**
+	 * Runs the core algorithm of...
 	 * 
 	 */
 	public void runQuineMcCluskey(){
 		System.out.println("\nRunning Quine McCluskey...");
 		
-		/*
-		 * 1. Group the minterms based on the number of 1's contained 
-		 * in each binary representation.
-		 * -establish list of implicant groups
-		 * -add to table
-		 */
-		
+		int size = LITERAL_COUNT;
 		McQuineTable bufferTable;
 		
-		int bitCount;
-		String format;
-		for(Implicant imp : implicants){
-			bitCount = Integer.bitCount(Integer.parseInt(imp.getMintermList()));
-
-			format = String.format("%"+LITERAL_COUNT+"s | %2s | %s", imp.getBinaryValue(), imp.getMintermList(), bitCount);
-			System.out.println(format);
+		while(size < LITERAL_COUNT){
+			
 		}
+		
+		bufferTable = new McQuineTable(size);
+		/*
+		 * Group implicants based on number of 1s 
+		 */
+		for(Implicant imp : implicants){ //Group 
+			bufferTable.addImplicant(imp.getBitCount(), imp);
+		}
+		
+		System.out.println("\nbufferTable:");
+		
+		mcquineTables.add(bufferTable);
+		bufferTable.printTable();
+		
+		/*
+		 * Compare sections to produce the next tables. Loop until all minterms compared 
+		 */
+		bufferTable = new McQuineTable(size);
+		
+		
+		
 	}
 
 	private void print(int[] minterms){
