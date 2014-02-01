@@ -3,16 +3,16 @@ package ph.edu.upm.dpsm.cmsc130.mcquine.model;
 import java.util.*;
 
 public class Implicant{
-	private int[] minterms, dashPositions;
+	private int[] minterms, weightPositions;
 	private int bitCount;
 	private String binaryValue;
 	private boolean isPaired;
 	
 	
-	public Implicant(int[] minterms, String binaryValue, int[] dashPositions) {
+	public Implicant(int[] minterms, String binaryValue, int[] weightPositions) {
 		this.minterms = minterms;
 		this.binaryValue = new String(binaryValue);
-		this.dashPositions = dashPositions;
+		this.weightPositions = weightPositions;
 		setPaired(false);
 		setBitCount();
 	}
@@ -30,8 +30,8 @@ public class Implicant{
 		return bitCount;
 	}
 	
-	public String getDashPositions(){
-		return Arrays.toString(dashPositions);
+	public String getWeightPositions(){
+		return Arrays.toString(weightPositions);
 	}
 
 	public boolean isPaired() {
@@ -43,7 +43,7 @@ public class Implicant{
 	}
 	
 	public String toString(){
-		return bitCount + "\t\t" + Arrays.toString(minterms) + "\t\t" + binaryValue + "\t\t" + Arrays.toString(dashPositions) + "\t" + isPaired;
+		return bitCount + "\t\t" + Arrays.toString(minterms) + "\t\t" + binaryValue + "\t\t" + Arrays.toString(weightPositions) + "\t" + isPaired;
 	}
 	
 	public String getBinaryValue(){
