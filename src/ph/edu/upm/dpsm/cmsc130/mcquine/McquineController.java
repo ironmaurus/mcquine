@@ -8,12 +8,15 @@ import ph.edu.upm.dpsm.cmsc130.mcquine.model.*;
 public class McQuineController {
 	private final int LITERAL_COUNT;
 	private Implicant[] implicants;
+	private int[] minterms;
 
 	private ArrayList<McQuineTable> mcquineTables;
+	private ArrayList<PrimeImplicant> primeImps, finalImps;
+	private String output;
 
 	public static void main(String[] args) {
-		McQuineController engine = new McQuineController("1 4 6 7 8 9 10 11 15");
-		//McQuineController engine = new McQuineController("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15");
+		//McQuineController engine = new McQuineController("1 4 6 7 8 9 10 11 15");
+		McQuineController engine = new McQuineController("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15");
 		engine.runQuineMcCluskey();
 	}
 
@@ -26,7 +29,7 @@ public class McQuineController {
 
 		String[] tokens = input.split(" ");
 		int MINTERM_COUNT = tokens.length;
-		int[] minterms = new int[MINTERM_COUNT];
+		minterms = new int[MINTERM_COUNT];
 
 		for(int i = 0; i < MINTERM_COUNT; i++){ //get minterms
 			try{
@@ -65,28 +68,10 @@ public class McQuineController {
 		 * Insert other initializations here....
 		 */
 		mcquineTables = new ArrayList<McQuineTable>();
+		primeImps = new ArrayList<PrimeImplicant>();
+		finalImps = new ArrayList<PrimeImplicant>();
+		output = new String("");
 	}
-
-	//	private int[] getWeightPositions(String binaryString) {
-	//		ArrayList<Integer> weightList = new ArrayList<Integer>();
-	//		String s = new StringBuilder(binaryString).reverse().toString();
-	//		char bit = (s.contains("-")) ? '-':  '1';
-	//		for(int i = 0; i < s.length(); i++){
-	//			if(s.charAt(i) == bit){
-	//				weightList.add(new Double(Math.pow(2, i)).intValue());
-	//			}
-	//		}
-	//		
-	//		System.out.println(weightList.toString());
-	//		
-	//		int[] weightPos = new int[weightList.size()];
-	//	    for (int i=0; i < weightPos.length; i++)
-	//	    {
-	//	        weightPos[i] = weightList.get(i).intValue();
-	//	    }
-	//		
-	//		return weightPos;
-	//	}
 
 	/**
 	 * Evaluates the number of literals using the maximum/highest minterm value.
@@ -131,13 +116,13 @@ public class McQuineController {
 
 		String binaryResult;
 		int[] mintermList;
-		ArrayList<Implicant> above, below, impList = new ArrayList<Implicant>();
+		ArrayList<Implicant> above, below, impList;
 		Implicant imp1, imp2;
 		HashMap<Integer, ArrayList<Implicant>> sections;
 		while(bufferTable.isComparable()){
 			System.out.println("------------------------------------------------------ " + bufferTable.getSize());
 
-			//impList = bufferTable.getImplicantList();
+			impList = new ArrayList<Implicant>();
 			sections = bufferTable.getMcQuineSections();
 
 			Map.Entry<Integer, ArrayList<Implicant>> secAbove = null;
@@ -153,7 +138,7 @@ public class McQuineController {
 							imp1 = above.get(i);
 							imp2 = below.get(j);
 
-							if(isComparable(imp1.getBinaryValue(), imp2.getBinaryValue())){
+							if(difference(imp1.getBinaryValue(), imp2.getBinaryValue()) == 1){
 								System.out.println(imp1.getBinaryValue()+" || "+imp2.getBinaryValue());
 
 								binaryResult = evaluateBinaryValue(imp1.getBinaryValue(), imp2.getBinaryValue());
@@ -175,7 +160,6 @@ public class McQuineController {
 			for(Implicant imp: impList){
 				bufferTable.addImplicant(imp.getBitCount(), imp);
 			}
-			impList = new ArrayList<Implicant>();
 		};
 
 		System.out.println("Comparison is complete.");
@@ -183,7 +167,168 @@ public class McQuineController {
 		for(int i = 0; i < mcquineTables.size(); i++){
 			System.out.println("\n**************************Table "+i+"************************\n");
 			mcquineTables.get(i).printTable();
+		}
 
+		ArrayList<Implicant> primeImplicants = new ArrayList<Implicant>();
+		boolean duplicate = false;
+		for(McQuineTable table : mcquineTables){
+			for(Implicant imp : table.getImplicantList()){
+				if(imp.isPaired() == false){
+					for(Implicant pi : primeImplicants){
+						if(imp.getBinaryValue().equals(pi.getBinaryValue())){
+							duplicate = true;
+						}
+					}
+
+					if(duplicate == false){
+						primeImplicants.add(imp);
+					}
+
+				}
+			}
+		}
+
+		printTable(primeImplicants);
+
+		primeImps = new ArrayList<PrimeImplicant>();
+		for(Implicant imp : primeImplicants){
+			primeImps.add(new PrimeImplicant(imp, minterms));
+		}
+
+		System.out.println("\nPrime Implicants Table");
+
+		//		for(PrimeImplicant prim : primeImps){
+		//			System.out.println(prim.toString());
+		//		}
+
+		for(int mint : minterms){
+			for(PrimeImplicant prim : primeImps){
+				if(prim.contains(mint)){
+					prim.markMinterm(mint, true);
+				}
+			}
+		}
+
+		for(PrimeImplicant prim : primeImps){
+			System.out.println(prim.toString());
+		}
+
+		int count;
+		for(int mint : minterms){
+			count = 0;
+			for(PrimeImplicant prim : primeImps){
+				if(prim.contains(mint)){
+					count++;
+				}
+			}
+			if(count == 1){
+				for(PrimeImplicant pi : primeImps){
+					if(pi.contains(mint)){
+						if(finalImps.isEmpty()){
+							finalImps.add(pi);
+						}
+						else{
+							if(!finalImps.contains(pi)){
+								finalImps.add(pi);
+							}
+						}
+					}
+				}
+			}
+		}
+
+
+		for(PrimeImplicant fimp : finalImps){
+			primeImps.remove(fimp);
+		}
+
+		System.out.println("\nEssential Prime Implicants...");
+
+		for(PrimeImplicant prim : finalImps){
+			System.out.println(prim.toString());
+		}
+
+		ArrayList<Integer> mintermsLeft = new ArrayList<Integer>();
+		for(PrimeImplicant prim : primeImps){
+			for(int imp : prim.getImplicant().getMinterms()){
+				mintermsLeft.add(imp);
+			}
+		}
+		
+		for(Integer n : mintermsLeft){
+			count = 0;
+			for(PrimeImplicant pi : primeImps){
+				if(pi.contains(n)){
+					count++;
+				}
+			}
+			
+			if(count == 1){
+				for(PrimeImplicant pi : primeImps){
+					if(pi.contains(n)){
+						pi.markMinterm(n, false);
+					}
+				}
+			}
+		}
+
+		System.out.println();
+		for(PrimeImplicant prim : primeImps){
+			System.out.println(prim.toString());
+		}
+		
+		if(!primeImps.isEmpty()){
+			PrimeImplicant dominant = primeImps.get(0);
+			for(PrimeImplicant pi : primeImps){
+				if(pi.getMarkCount() > dominant.getMarkCount()){
+					dominant = pi;
+				}
+			}
+			
+			finalImps.add(dominant);
+		}
+		
+		if(!finalImps.isEmpty()){
+			output = evaluateExpression(finalImps);
+		}
+		else{
+			output = "1";
+		}
+		
+		
+//		for(int i = 0; i < 26; i++){
+//			System.out.println(getTerm(i));
+//		}
+//				
+		System.out.println("\nThe simplified expression is: "+output);
+	}
+
+	private String evaluateExpression(ArrayList<PrimeImplicant> primeImplicants) {
+		String expression = new String("");
+		String binaryBuffer, term = new String("");
+		for(PrimeImplicant pi : primeImplicants){
+			binaryBuffer = pi.getImplicant().getBinaryValue();
+			for(int i = 0; i < binaryBuffer.length(); i++){
+				if(binaryBuffer.charAt(i) != '-'){
+					expression += getTerm(i);
+					if(binaryBuffer.charAt(i) == '0'){
+						expression += "'"; 
+					}
+				}
+			}
+			expression += "+";
+		}
+		
+		return expression.substring(0, expression.length()-1);
+	}
+	
+	private char getTerm(int n){
+		return new Character((char) (n + 'a'));
+	}
+
+	private void printTable(ArrayList<Implicant> imps) {
+		for(Implicant imp : imps){
+			System.out.println(Arrays.toString(imp.getMinterms())+"||"+imp.getBinaryValue());
 		}
 	}
 
@@ -220,11 +365,7 @@ public class McQuineController {
 		return result;
 	}
 
-	private boolean isPowerOfTwo(int n){
-		return ((n & (n - 1)) == 0) ? true : false;
-	}
-
-	private boolean isComparable(String binary1, String binary2){
+	private int difference(String binary1, String binary2){
 		int difference = 0;
 
 		for(int i = 0; i < binary1.length(); i++){
@@ -233,14 +374,7 @@ public class McQuineController {
 			}
 		}
 
-		return (difference > 1) ? false : true;
-	}
-
-	private void print(ArrayList<Implicant> impList) {
-		for(Implicant item : impList){
-			System.out.println(item + " ");
-		}
-		System.out.println();
+		return difference;
 	}
 
 	private void print(int[] minterms){
