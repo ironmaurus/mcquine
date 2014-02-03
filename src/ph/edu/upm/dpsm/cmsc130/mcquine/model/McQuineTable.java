@@ -30,14 +30,15 @@ public class McQuineTable {
 	public void printTable(){
 		ArrayList<Implicant> bufferGroup;
 		for(int i = 0; i < size; i++){
-			System.out.println("-----------------MCQUINESECTION: "+i+" --------------------------");
+			
 			bufferGroup = mcQuineSections.get(i);
 			
 			if(bufferGroup.isEmpty()){
-				System.out.println("EMPTY!");
+				//System.out.println("EMPTY!");
 			}
 			else{
-				System.out.println("BitCount\tMinterms\tBinaryValue\tDashes\tisPaired");
+				System.out.println("-----------------MCQUINESECTION: "+i+" --------------------------");
+				System.out.println("BitCount Minterms BinaryValue isPaired Dashes");
 				for(Implicant imp :  bufferGroup){
 					System.out.println(imp.toString());
 				}

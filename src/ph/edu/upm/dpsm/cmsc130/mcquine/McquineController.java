@@ -12,7 +12,8 @@ public class McQuineController {
 	private ArrayList<McQuineTable> mcquineTables;
 
 	public static void main(String[] args) {
-		McQuineController engine = new McQuineController("15 4 6 7 8 9 10 11 1");
+		McQuineController engine = new McQuineController("1 4 6 7 8 9 10 11 15");
+		//McQuineController engine = new McQuineController("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15");
 		engine.runQuineMcCluskey();
 	}
 
@@ -48,13 +49,14 @@ public class McQuineController {
 
 		System.out.println("\nInitializing list of implicants...\n");
 		String raw, formatted;
-		int[] minterm, weightPositions;
+		int[] mintermList;
 		for(int i = 0; i < MINTERM_COUNT; i++){
-			minterm = new int[]{minterms[i]};
+			mintermList = new int[]{minterms[i]};
 			raw = Integer.toBinaryString(minterms[i]);
 			formatted = String.format("%0"+LITERAL_COUNT+"d", new BigInteger(raw));
-			weightPositions = getWeightPositions(formatted);
-			implicants[i] = new Implicant(minterm, formatted, weightPositions);
+			//weightPositions = setWeightPositions(formatted);
+			implicants[i] = new Implicant(mintermList, formatted);
+			//implicants[i].setWeightPositions(formatted);
 		}
 
 		print(implicants);
@@ -65,20 +67,26 @@ public class McQuineController {
 		mcquineTables = new ArrayList<McQuineTable>();
 	}
 
-	private int[] getWeightPositions(String binaryString) {
-		ArrayList<Integer> weightList = new ArrayList<Integer>();
-		String s = new StringBuilder(binaryString).reverse().toString();
-		char bit = (s.contains("-")) ? '-':  '1';
-		for(int i = 0; i < s.length(); i++){
-			if(s.charAt(i) == bit){
-				weightList.add(new Double(Math.pow(2, i)).intValue());
-			}
-		}
-		
-		System.out.println(weightList.toArray());
-		
-		return null;
-	}
+	//	private int[] getWeightPositions(String binaryString) {
+	//		ArrayList<Integer> weightList = new ArrayList<Integer>();
+	//		String s = new StringBuilder(binaryString).reverse().toString();
+	//		char bit = (s.contains("-")) ? '-':  '1';
+	//		for(int i = 0; i < s.length(); i++){
+	//			if(s.charAt(i) == bit){
+	//				weightList.add(new Double(Math.pow(2, i)).intValue());
+	//			}
+	//		}
+	//		
+	//		System.out.println(weightList.toString());
+	//		
+	//		int[] weightPos = new int[weightList.size()];
+	//	    for (int i=0; i < weightPos.length; i++)
+	//	    {
+	//	        weightPos[i] = weightList.get(i).intValue();
+	//	    }
+	//		
+	//		return weightPos;
+	//	}
 
 	/**
 	 * Evaluates the number of literals using the maximum/highest minterm value.
@@ -93,13 +101,26 @@ public class McQuineController {
 		return exponent; 
 	}
 
-
 	/**
 	 * Runs the core algorithm of...
 	 * 
 	 */
 	public void runQuineMcCluskey(){
 		System.out.println("\nRunning Quine McCluskey...");
+
+		/*
+		 * 1 add implicant list to a buffer table
+		 * 2 loop while buffertable is comparable //bufferTable.isEmpty() == false
+		 * 		compare implicantList
+		 * 		store result to new list, update boolean of buffertable //buffertable updated, new implicant list
+		 * 		store updated buffertable to mcquinetables
+		 *      initialize buffertable with the new implicantlist
+		 *      
+		 * if buffertable is not comparable,
+		 * 		store result in mcquinetables
+		 * else
+		 * 		continue loop     
+		 */
 
 		int size = LITERAL_COUNT;
 		McQuineTable bufferTable = new McQuineTable(size+1);
@@ -108,46 +129,53 @@ public class McQuineController {
 			bufferTable.addImplicant(imp.getBitCount(), imp);
 		}
 
-		mcquineTables.add(bufferTable); //simple addition for first table
-
-		ArrayList<Implicant> impList, compareList;
-		HashMap<Integer, ArrayList<Implicant>> bufferSections;
+		String binaryResult;
+		int[] mintermList;
+		ArrayList<Implicant> above, below, impList = new ArrayList<Implicant>();
+		Implicant imp1, imp2;
+		HashMap<Integer, ArrayList<Implicant>> sections;
 		while(bufferTable.isComparable()){
-			impList = bufferTable.getImplicantList();
-			bufferSections = bufferTable.getMcQuineSections();
+			System.out.println("------------------------------------------------------ " + bufferTable.getSize());
 
-			for(Implicant imp : impList){
-				for(Map.Entry<Integer, ArrayList<Implicant>> section : bufferSections.entrySet()){
-					if(imp.getBitCount()+1 == section.getKey()){
-						for(Implicant compareImp : section.getValue()){
-							if(bufferTable.getSize() == size+1){ //if true, the implicants have no dash positions, they are contained in the first mcquine table
-								System.out.println("The implicants are from the first McQuineTable!");
+			//impList = bufferTable.getImplicantList();
+			sections = bufferTable.getMcQuineSections();
 
-							}
-							else{
-								System.out.println(imp.getWeightPositions() + "*");
-								System.out.println(compareImp.getWeightPositions() + "*");
-								if(imp.getWeightPositions() == compareImp.getWeightPositions()){
-									System.out.println("comparing " + imp.getBinaryValue() + " and " + compareImp.getBinaryValue());
+			Map.Entry<Integer, ArrayList<Implicant>> secAbove = null;
+			for(Map.Entry<Integer, ArrayList<Implicant>> secBelow : sections.entrySet()){
+				if(secAbove != null){
+					above = secAbove.getValue();
+					below = secBelow.getValue();
 
-								}
+					System.out.println("Comparing: "+secAbove.getKey() + "||" + secBelow.getKey());
+
+					for(int i = 0; i < above.size(); i++){
+						for(int j = 0; j < below.size(); j++){
+							imp1 = above.get(i);
+							imp2 = below.get(j);
+
+							if(isComparable(imp1.getBinaryValue(), imp2.getBinaryValue())){
+								System.out.println(imp1.getBinaryValue()+" || "+imp2.getBinaryValue());
+
+								binaryResult = evaluateBinaryValue(imp1.getBinaryValue(), imp2.getBinaryValue());
+								mintermList = combineMinterms(imp1.getMinterms(), imp2.getMinterms());
+
+								impList.add(new Implicant(mintermList, binaryResult));
+
+								imp1.setPaired(true);
+								imp2.setPaired(true);
 							}
 						}
 					}
 				}
-			}			
-
-			bufferTable = new McQuineTable(size--); //initialization for new table
-			System.out.println("size for the next loop: " + size);
-
-			System.exit(1);
-
-
-			//bufferTable = new McQuineTable(sections.size()-1);
-
-			System.exit(1);
+				secAbove = secBelow;
+			}
 
 			mcquineTables.add(bufferTable);
+			bufferTable = new McQuineTable(size--);
+			for(Implicant imp: impList){
+				bufferTable.addImplicant(imp.getBitCount(), imp);
+			}
+			impList = new ArrayList<Implicant>();
 		};
 
 		System.out.println("Comparison is complete.");
@@ -155,12 +183,62 @@ public class McQuineController {
 		for(int i = 0; i < mcquineTables.size(); i++){
 			System.out.println("\n**************************Table "+i+"************************\n");
 			mcquineTables.get(i).printTable();
+
 		}
 	}
 
-	private void print(Integer[] items){
-		for(int item : items){
-			System.out.print(item + " ");
+	private int[] combineMinterms(int[] mints1, int[] mints2) {
+		ArrayList<Integer> mintBuffer = new ArrayList<Integer>();
+		for(int i = 0; i < mints1.length; i++){
+			mintBuffer.add(mints1[i]);
+		}
+
+		for(int i = 0; i < mints2.length; i++){
+			mintBuffer.add(mints2[i]);
+		}
+
+		int[] mints = new int[mintBuffer.size()];
+		for(int i = 0; i < mints.length; i++){
+			mints[i] = mintBuffer.get(i);
+		}
+
+		return mints;
+	}
+
+	private String evaluateBinaryValue(String binary1, String binary2) {
+		String result = new String("");
+		for(int i = 0; i < binary1.length(); i++){
+			if(binary1.charAt(i) == binary2.charAt(i)){
+				result+= binary1.charAt(i);
+			}
+			else{
+				result += "-";
+			}
+		}
+
+		System.out.println(result);
+		return result;
+	}
+
+	private boolean isPowerOfTwo(int n){
+		return ((n & (n - 1)) == 0) ? true : false;
+	}
+
+	private boolean isComparable(String binary1, String binary2){
+		int difference = 0;
+
+		for(int i = 0; i < binary1.length(); i++){
+			if(binary1.charAt(i) != binary2.charAt(i)){
+				difference++;
+			}
+		}
+
+		return (difference > 1) ? false : true;
+	}
+
+	private void print(ArrayList<Implicant> impList) {
+		for(Implicant item : impList){
+			System.out.println(item + " ");
 		}
 		System.out.println();
 	}
