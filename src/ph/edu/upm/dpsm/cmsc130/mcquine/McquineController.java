@@ -14,14 +14,22 @@ public class McQuineController {
 	private ArrayList<PrimeImplicant> primeImps, finalImps;
 	private String output;
 
-//	public static void main(String[] args) {
-//		//McQuineController engine = new McQuineController("0 1 2 5 8 9 10");
-//		//McQuineController engine = new McQuineController("0 1 2 8 10 11 14 15");
-//		//McQuineController engine = new McQuineController("0 2 4 6 9 13 21 23 25 29 31");
-//		//McQuineController engine = new McQuineController("0 2 3 4 5 6 7 8 9 10 11 12 13");
-//		//McQuineController engine = new McQuineController("20 28 38 39 52 60 102 103 127");
-//	}
-
+	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
+		String input = new String("");
+		System.out.println("Quine-McCluskey Simulator!");
+		System.out.println("Please input all the minterms that evaluate to 1 separated by space:");
+		
+		if(scan.hasNextLine()){
+			input = scan.nextLine();
+		}
+		
+		if(!input.isEmpty()){
+			McQuineController engine = new McQuineController(input);
+			engine.runQuineMcCluskey();
+		}
+	}
+	
 	/**
 	 * Controller constructor. Initializes the mcquine engine. 
 	 * @param input string containing the minterms separated by space.
@@ -42,6 +50,17 @@ public class McQuineController {
 				e.printStackTrace();
 			}
 		}
+//		
+//		HashSet<Integer> mintermSet = new HashSet<Integer>();
+//		for(int m : minterms){
+//			mintermSet.add(m);
+//		}
+//		
+//		minterms = new int[mintermSet.size()];
+//		Integer[] buff = (Integer[]) mintermSet.toArray();
+//		for(int i = 0; i < minterms.length; i++){
+//			minterms[i] = buff[i];
+//		}
 
 		Arrays.sort(minterms);
 		System.out.print("Minterms:\t");
@@ -81,8 +100,9 @@ public class McQuineController {
 	 * @return number of literals/variables to use for the boolean expression.
 	 */
 	private int evaluateLiteralCount(int maxMinterm){
+		System.out.println(maxMinterm);
 		int exponent = 0;
-		while(maxMinterm > Math.pow(2, exponent)){
+		while(maxMinterm >= Math.pow(2, exponent)){
 			exponent++;
 		}
 		return exponent; 
@@ -90,7 +110,6 @@ public class McQuineController {
 
 	/**
 	 * Runs the core algorithm of...
-	 * 
 	 */
 	public void runQuineMcCluskey(){
 		System.out.println("\nRunning Quine McCluskey...");
@@ -154,7 +173,7 @@ public class McQuineController {
 		System.out.println("Comparison is complete.");
 
 		for(int i = 0; i < mcquineTables.size(); i++){
-			System.out.println("\n**************************Table "+i+"************************\n");
+			System.out.println("\nTable "+i+"\n");
 			mcquineTables.get(i).printTable();
 		}
 
@@ -259,8 +278,11 @@ public class McQuineController {
 				}
 			}
 
-			finalImps.add(dominant);
-			primeImps.remove(dominant);
+			if(dominant.getMarkCount() != 0){
+				finalImps.add(dominant);
+				primeImps.remove(dominant);
+			}
+			
 			
 			for(int m : dominant.getImplicant().getMinterms()){
 				for(PrimeImplicant pi: primeImps){
@@ -489,6 +511,12 @@ public class McQuineController {
 		return mints;
 	}
 
+	/**
+	 * 
+	 * @param binary1
+	 * @param binary2
+	 * @return
+	 */
 	private String evaluateBinaryValue(String binary1, String binary2) {
 		String result = new String("");
 		for(int i = 0; i < binary1.length(); i++){
