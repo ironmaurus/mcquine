@@ -35,14 +35,14 @@ public class PrimeImplicant {
 	public String toString(){
 		String s = new String("");
 		for(Entry<Integer, Boolean> mint : mintermList.entrySet()){
-			s+="|";
+			s+="| ";
 			if(mint.getValue() == true){
 				s += "x";
 			}
 			else{
 				s +="_";
 			}
-			s+="|";
+			s+=" |";
 		}
 		
 		s += "\t" + Arrays.toString(imp.getMinterms());
