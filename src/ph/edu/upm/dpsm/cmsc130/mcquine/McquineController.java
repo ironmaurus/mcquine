@@ -15,8 +15,14 @@ public class McQuineController {
 	private String output;
 
 	public static void main(String[] args) {
-		//McQuineController engine = new McQuineController("1 4 6 7 8 9 10 11 15");
-		McQuineController engine = new McQuineController("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15");
+		//McQuineController engine = new McQuineController("0 1 2 5 8 9 10");
+		//McQuineController engine = new McQuineController("0 1 2 8 10 11 14 15");
+		//McQuineController engine = new McQuineController("0 2 4 6 9 13 21 23 25 29 31");
+		McQuineController engine = new McQuineController("1 4 6 7 8 9 10 11 15");
+		//McQuineController engine = new McQuineController("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15");
+		//McQuineController engine = new McQuineController("0 2 5 6 7 8 10 12 13 14 15");
+		//McQuineController engine = new McQuineController("0 2 3 4 5 6 7 8 9 10 11 12 13");
+		//McQuineController engine = new McQuineController("20 28 38 39 52 60 102 103 127");
 		engine.runQuineMcCluskey();
 	}
 
@@ -119,6 +125,7 @@ public class McQuineController {
 		ArrayList<Implicant> above, below, impList;
 		Implicant imp1, imp2;
 		HashMap<Integer, ArrayList<Implicant>> sections;
+		
 		while(bufferTable.isComparable()){
 			System.out.println("------------------------------------------------------ " + bufferTable.getSize());
 
@@ -185,6 +192,7 @@ public class McQuineController {
 					}
 
 				}
+				duplicate = false;
 			}
 		}
 
@@ -273,22 +281,34 @@ public class McQuineController {
 		}
 
 		System.out.println();
+		print(minterms);
 		for(PrimeImplicant prim : primeImps){
 			System.out.println(prim.toString());
 		}
 		
 		if(!primeImps.isEmpty()){
-			PrimeImplicant dominant = primeImps.get(0);
-			for(PrimeImplicant pi : primeImps){
-				if(pi.getMarkCount() > dominant.getMarkCount()){
-					dominant = pi;
-				}
+			if(primeImps.size() % 2 == 0){
+				PrimeImplicant dominant = primeImps.get(0);
+				System.out.println("EVEN");
 			}
-			
-			finalImps.add(dominant);
+			else{
+				PrimeImplicant dominant = primeImps.get(0);
+				for(PrimeImplicant pi : primeImps){
+					if(pi.getMarkCount() > dominant.getMarkCount()){
+						dominant = pi;
+					}
+				}
+				
+				finalImps.add(dominant);
+			}
 		}
 		
 		if(!finalImps.isEmpty()){
+			System.out.println(":D:D:D:D");
+			for(PrimeImplicant pi : primeImps){
+				System.out.println(pi.toString());
+			}
+			
 			output = evaluateExpression(finalImps);
 		}
 		else{
@@ -379,7 +399,7 @@ public class McQuineController {
 
 	private void print(int[] minterms){
 		for(int item : minterms){
-			System.out.print(item + " ");
+			System.out.print(String.format("| %s |", item));
 		}
 		System.out.println();
 	}
