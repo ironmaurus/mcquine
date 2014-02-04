@@ -19,6 +19,10 @@ public class PrimeImplicant {
 		}
 	}
 	
+	public void removeMinterm(int minterm){
+		mintermList.remove(minterm);
+	}
+	
 	public void markMinterm(int minterm, boolean key){
 		mintermList.put(minterm, key);
 	}
@@ -46,7 +50,7 @@ public class PrimeImplicant {
 		}
 		
 		s += "\t" + Arrays.toString(imp.getMinterms());
-		
+		s+= "\t" + this.getMarkCount();
 		return s;
 	}
 	

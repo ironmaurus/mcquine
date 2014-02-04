@@ -14,17 +14,13 @@ public class McQuineController {
 	private ArrayList<PrimeImplicant> primeImps, finalImps;
 	private String output;
 
-	public static void main(String[] args) {
-		//McQuineController engine = new McQuineController("0 1 2 5 8 9 10");
-		//McQuineController engine = new McQuineController("0 1 2 8 10 11 14 15");
-		//McQuineController engine = new McQuineController("0 2 4 6 9 13 21 23 25 29 31");
-		McQuineController engine = new McQuineController("1 4 6 7 8 9 10 11 15");
-		//McQuineController engine = new McQuineController("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15");
-		//McQuineController engine = new McQuineController("0 2 5 6 7 8 10 12 13 14 15");
-		//McQuineController engine = new McQuineController("0 2 3 4 5 6 7 8 9 10 11 12 13");
-		//McQuineController engine = new McQuineController("20 28 38 39 52 60 102 103 127");
-		engine.runQuineMcCluskey();
-	}
+//	public static void main(String[] args) {
+//		//McQuineController engine = new McQuineController("0 1 2 5 8 9 10");
+//		//McQuineController engine = new McQuineController("0 1 2 8 10 11 14 15");
+//		//McQuineController engine = new McQuineController("0 2 4 6 9 13 21 23 25 29 31");
+//		//McQuineController engine = new McQuineController("0 2 3 4 5 6 7 8 9 10 11 12 13");
+//		//McQuineController engine = new McQuineController("20 28 38 39 52 60 102 103 127");
+//	}
 
 	/**
 	 * Controller constructor. Initializes the mcquine engine. 
@@ -99,20 +95,6 @@ public class McQuineController {
 	public void runQuineMcCluskey(){
 		System.out.println("\nRunning Quine McCluskey...");
 
-		/*
-		 * 1 add implicant list to a buffer table
-		 * 2 loop while buffertable is comparable //bufferTable.isEmpty() == false
-		 * 		compare implicantList
-		 * 		store result to new list, update boolean of buffertable //buffertable updated, new implicant list
-		 * 		store updated buffertable to mcquinetables
-		 *      initialize buffertable with the new implicantlist
-		 *      
-		 * if buffertable is not comparable,
-		 * 		store result in mcquinetables
-		 * else
-		 * 		continue loop     
-		 */
-
 		int size = LITERAL_COUNT;
 		McQuineTable bufferTable = new McQuineTable(size+1);
 
@@ -125,7 +107,7 @@ public class McQuineController {
 		ArrayList<Implicant> above, below, impList;
 		Implicant imp1, imp2;
 		HashMap<Integer, ArrayList<Implicant>> sections;
-		
+
 		while(bufferTable.isComparable()){
 			System.out.println("------------------------------------------------------ " + bufferTable.getSize());
 
@@ -198,6 +180,11 @@ public class McQuineController {
 
 		printTable(primeImplicants);
 
+		ArrayList<Integer> mints = new ArrayList<Integer>();
+		for(int m : minterms){
+			mints.add(m);
+		}
+
 		primeImps = new ArrayList<PrimeImplicant>();
 		for(Implicant imp : primeImplicants){
 			primeImps.add(new PrimeImplicant(imp, minterms));
@@ -221,9 +208,8 @@ public class McQuineController {
 			System.out.println(prim.toString());
 		}
 
-		int count;
 		for(int mint : minterms){
-			count = 0;
+			int count = 0;
 			for(PrimeImplicant prim : primeImps){
 				if(prim.contains(mint)){
 					count++;
@@ -244,82 +230,215 @@ public class McQuineController {
 				}
 			}
 		}
-
-
+		
 		for(PrimeImplicant fimp : finalImps){
 			primeImps.remove(fimp);
-		}
 
-		System.out.println("\nEssential Prime Implicants...");
-
-		for(PrimeImplicant prim : finalImps){
-			System.out.println(prim.toString());
-		}
-
-		ArrayList<Integer> mintermsLeft = new ArrayList<Integer>();
-		for(PrimeImplicant prim : primeImps){
-			for(int imp : prim.getImplicant().getMinterms()){
-				mintermsLeft.add(imp);
-			}
-		}
-		
-		for(Integer n : mintermsLeft){
-			count = 0;
-			for(PrimeImplicant pi : primeImps){
-				if(pi.contains(n)){
-					count++;
-				}
-			}
-			
-			if(count == 1){
+			for(int m : fimp.getImplicant().getMinterms()){
 				for(PrimeImplicant pi : primeImps){
-					if(pi.contains(n)){
-						pi.markMinterm(n, false);
-					}
+					pi.removeMinterm(m);
 				}
 			}
 		}
 
-		System.out.println();
-		print(minterms);
-		for(PrimeImplicant prim : primeImps){
-			System.out.println(prim.toString());
-		}
-		
-		if(!primeImps.isEmpty()){
-			if(primeImps.size() % 2 == 0){
-				PrimeImplicant dominant = primeImps.get(0);
-				System.out.println("EVEN");
-			}
-			else{
-				PrimeImplicant dominant = primeImps.get(0);
-				for(PrimeImplicant pi : primeImps){
-					if(pi.getMarkCount() > dominant.getMarkCount()){
-						dominant = pi;
-					}
-				}
-				
-				finalImps.add(dominant);
-			}
-		}
-		
-		if(!finalImps.isEmpty()){
-			System.out.println(":D:D:D:D");
-			for(PrimeImplicant pi : primeImps){
+		while(!primeImps.isEmpty()){
+			System.out.println("XD");
+			for(PrimeImplicant pi : finalImps){
 				System.out.println(pi.toString());
 			}
 			
+			System.out.println("((:");
+			for(PrimeImplicant pi : primeImps){
+				System.out.println(pi.toString());
+			}
+
+			PrimeImplicant dominant = primeImps.get(0);
+			for(PrimeImplicant pi : primeImps){
+				if(pi.getMarkCount() > dominant.getMarkCount()){
+					dominant = pi;
+				}
+			}
+
+			finalImps.add(dominant);
+			primeImps.remove(dominant);
+			
+			for(int m : dominant.getImplicant().getMinterms()){
+				for(PrimeImplicant pi: primeImps){
+					pi.removeMinterm(m);
+				}
+			}
+			
+			boolean mark = true;
+			for(PrimeImplicant pi : primeImps){
+				if(pi.getMarkCount() > 0){
+					mark = false;
+				}
+			}
+			
+			if(mark == true){
+				break;
+			}
+			
+			
+//			boolean dup = false;
+//			if(!finalImps.isEmpty()){
+//				for(PrimeImplicant pi: finalImps){
+//					for(int m : dominant.getImplicant().getMinterms()){
+//						if(pi.contains(m)){
+//							dup = true;
+//						}
+//					}
+//				}
+//			}
+//
+//			if(dup == false){
+//				
+//			}
+			
+			
+//			
+//			System.exit(1);
+//
+//			for(PrimeImplicant fimp : finalImps){
+//				for(int m : fimp.getImplicant().getMinterms()){
+//					for(PrimeImplicant pi : primeImps){
+//						pi.removeMinterm(m);
+//					}
+//				}
+//				
+//				primeImps.remove(fimp);
+//			}
+//			
+//			if(!primeImps.isEmpty()){
+//				boolean mark = false;
+//				for(PrimeImplicant pi : primeImps){
+//					if(pi.getMarkCount() == 0){
+//						mark = true;
+//					}
+//					//System.out.println(pi.toString());
+//				}
+//				
+//				if(mark == true){
+//					break;
+//				}
+//			}
+		}
+		
+		System.out.println("Prime  Implicants End");
+		for(PrimeImplicant pi : primeImps){
+			System.out.println(pi.toString());
+		}
+
+		if(!finalImps.isEmpty()){
+			for(PrimeImplicant pi : finalImps){
+				System.out.println(pi.toString());
+			}
 			output = evaluateExpression(finalImps);
 		}
 		else{
 			output = "1";
 		}
-		
-		
-//		for(int i = 0; i < 26; i++){
-//			System.out.println(getTerm(i));
-//		}
-//				
+		//		
+		//
+		//		int count;
+		//		for(int mint : minterms){
+		//			count = 0;
+		//			for(PrimeImplicant prim : primeImps){
+		//				if(prim.contains(mint)){
+		//					count++;
+		//				}
+		//			}
+		//			if(count == 1){
+		//				for(PrimeImplicant pi : primeImps){
+		//					if(pi.contains(mint)){
+		//						if(finalImps.isEmpty()){
+		//							finalImps.add(pi);
+		//						}
+		//						else{
+		//							if(!finalImps.contains(pi)){
+		//								finalImps.add(pi);
+		//							}
+		//						}
+		//					}
+		//				}
+		//			}
+		//		}
+		//
+		//
+		//		for(PrimeImplicant fimp : finalImps){
+		//			primeImps.remove(fimp);
+		//		}
+		//
+		//		System.out.println("\nEssential Prime Implicants...");
+		//
+		//		for(PrimeImplicant prim : finalImps){
+		//			System.out.println(prim.toString());
+		//		}
+		//
+		//		ArrayList<Integer> mintermsLeft = new ArrayList<Integer>();
+		//		for(PrimeImplicant prim : primeImps){
+		//			for(int imp : prim.getImplicant().getMinterms()){
+		//				mintermsLeft.add(imp);
+		//			}
+		//		}
+		//		
+		//		for(Integer n : mintermsLeft){
+		//			count = 0;
+		//			for(PrimeImplicant pi : primeImps){
+		//				if(pi.contains(n)){
+		//					count++;
+		//				}
+		//			}
+		//			
+		//			if(count == 1){
+		//				for(PrimeImplicant pi : primeImps){
+		//					if(pi.contains(n)){
+		//						pi.markMinterm(n, false);
+		//					}
+		//				}
+		//			}
+		//		}
+		//
+		//		System.out.println();
+		//		print(minterms);
+		//		for(PrimeImplicant prim : primeImps){
+		//			System.out.println(prim.toString());
+		//		}
+		//		
+		//		if(!primeImps.isEmpty()){
+		//			if(primeImps.size() % 2 == 0){
+		//				PrimeImplicant dominant = primeImps.get(0);
+		//				System.out.println("EVEN");
+		//			}
+		//			else{
+		//				PrimeImplicant dominant = primeImps.get(0);
+		//				for(PrimeImplicant pi : primeImps){
+		//					if(pi.getMarkCount() > dominant.getMarkCount()){
+		//						dominant = pi;
+		//					}
+		//				}
+		//				
+		//				finalImps.add(dominant);
+		//			}
+		//		}
+		//		
+		//		if(!finalImps.isEmpty()){
+		//			System.out.println(":D:D:D:D");
+		//			for(PrimeImplicant pi : primeImps){
+		//				System.out.println(pi.toString());
+		//			}
+		//			
+		//			output = evaluateExpression(finalImps);
+		//		}
+		//		else{
+		//			output = "1";
+		//		}
+
+
+		//		for(int i = 0; i < 26; i++){
+		//			System.out.println(getTerm(i));
+		//		}
+		//				
 		System.out.println("\nThe simplified expression is: "+output);
 	}
 
@@ -338,10 +457,10 @@ public class McQuineController {
 			}
 			expression += "+";
 		}
-		
+
 		return expression.substring(0, expression.length()-1);
 	}
-	
+
 	private char getTerm(int n){
 		return new Character((char) (n + 'a'));
 	}
@@ -385,6 +504,10 @@ public class McQuineController {
 		return result;
 	}
 
+	public String getOutput(){
+		return output;
+	}
+
 	private int difference(String binary1, String binary2){
 		int difference = 0;
 
@@ -410,3 +533,4 @@ public class McQuineController {
 		}
 	}
 }
+
