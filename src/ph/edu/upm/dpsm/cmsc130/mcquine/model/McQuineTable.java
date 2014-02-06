@@ -34,15 +34,17 @@ public class McQuineTable {
 			bufferGroup = mcQuineSections.get(i);
 			
 			if(bufferGroup.isEmpty()){
-				//System.out.println("EMPTY!");
+				System.out.println("SECTION: "+i+"");
+				System.out.println("EMPTY!");
 			}
 			else{
-				System.out.println("-----------------MCQUINESECTION: "+i+" --------------------------");
-				System.out.println("BitCount Minterms BinaryValue isPaired Dashes");
+				System.out.println("SECTION: "+i+"");
+				System.out.println("| BitCount | BinaryValue |  Mark | MintermList");
 				for(Implicant imp :  bufferGroup){
 					System.out.println(imp.toString());
 				}
 			}
+			System.out.println();
 		}
 	}
 	

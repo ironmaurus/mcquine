@@ -4,14 +4,13 @@ import java.util.*;
 
 public class Implicant{
 	private int bitCount;
-	private int[] minterms, weightPositions;
+	private int[] minterms;
 	private String binaryValue;
 	private boolean isPaired; 
 	
 	public Implicant(int[] minterms, String binaryValue) {
 		this.binaryValue = new String(binaryValue);
 		this.minterms = minterms;
-		setWeightPositions(binaryValue);
 		setPaired(false);
 		setBitCount();
 	}
@@ -27,25 +26,6 @@ public class Implicant{
 	
 	public int getBitCount(){
 		return bitCount;
-	}
-	
-	public void setWeightPositions(String binaryString){
-		ArrayList<Integer> weightList = new ArrayList<Integer>();
-		String s = new StringBuilder(binaryString).reverse().toString();
-		for(int i = 0; i < s.length(); i++){
-			if(s.charAt(i) == '-'){
-				weightList.add(new Double(Math.pow(2, i)).intValue());
-			}
-		}
-		
-		weightPositions = new int[weightList.size()];
-		for(int i = 0; i < weightPositions.length; i++){
-			weightPositions[i] = weightList.get(i);
-		}
-	}
-	
-	public String getWeightPositions(){
-		return Arrays.toString(weightPositions);
 	}
 	
 	public int getMinterm(){
@@ -73,6 +53,6 @@ public class Implicant{
 	}
 	
 	public String toString(){
-		return bitCount + " " + Arrays.toString(minterms) + " " + binaryValue + " " + isPaired + " " + Arrays.toString(weightPositions);
+		return String.format("| %8d | %11s | %5s | %s ", bitCount, binaryValue, isPaired, Arrays.toString(minterms));
 	}	
 }
